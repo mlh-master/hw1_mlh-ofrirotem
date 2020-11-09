@@ -17,7 +17,7 @@ def rm_ext_and_nan(CTG_features, extra_feature):
     :return: A dictionary of clean CTG called c_ctg
     """
     # ------------------ IMPLEMENT YOUR CODE HERE:------------------------------
-
+    c_ctg = {f:pd.to_numeric(CTG_features[f], errors='coerce').fillna(1000) for f in CTG_features if f != extra_feature}
     # --------------------------------------------------------------------------
     return c_ctg
 
@@ -31,7 +31,9 @@ def nan2num_samp(CTG_features, extra_feature):
     """
     c_cdf = {}
     # ------------------ IMPLEMENT YOUR CODE HERE:------------------------------
-
+    for f in CTG_features:
+        if f != extra_feature:
+            c_cdf[f] = pd.to_numeric(CTG_features[f], errors='coerce').fillna(np.random.choice(CTG_features[f].convert_dtypes(convert_integer=True)))
     # -------------------------------------------------------------------------
     return pd.DataFrame(c_cdf)
 
@@ -43,7 +45,7 @@ def sum_stat(c_feat):
     :return: Summary statistics as a dicionary of dictionaries (called d_summary) as explained in the notebook
     """
     # ------------------ IMPLEMENT YOUR CODE HERE:------------------------------
-
+    d_summary = {f: {'min': c_feat[f].min(), 'Q1': c_feat[f].quantile(0.25), 'median': c_feat[f].median(), 'Q3': c_feat[f].quantile(0.75), 'max': c_feat[f].max()} for f in c_feat}
     # -------------------------------------------------------------------------
     return d_summary
 
@@ -57,7 +59,6 @@ def rm_outlier(c_feat, d_summary):
     """
     c_no_outlier = {}
     # ------------------ IMPLEMENT YOUR CODE HERE:------------------------------
-
     # -------------------------------------------------------------------------
     return pd.DataFrame(c_no_outlier)
 
