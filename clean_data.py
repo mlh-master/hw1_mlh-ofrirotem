@@ -95,8 +95,12 @@ def norm_standard(CTG_features, selected_feat=('LB', 'ASTV'), mode='none', flag=
     """
     x, y = selected_feat
     # ------------------ IMPLEMENT YOUR CODE HERE:------------------------------
-    if mode == 'none':
-        nsd_res = CTG_features
+    from sklearnearn.preprocessing import StandardScaler, MinMaxScaler
+    modes = {'Standard': StandardScaler(),
+             'MinMax': MinMaxScaler(),
+             'mean': None,
+             'none': None
+    }
     
     # -------------------------------------------------------------------------
     return pd.DataFrame(nsd_res)
