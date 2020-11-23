@@ -17,7 +17,7 @@ def rm_ext_and_nan(CTG_features, extra_feature):
     :return: A dictionary of clean CTG called c_ctg
     """
     # ------------------ IMPLEMENT YOUR CODE HERE:------------------------------
-    c_ctg = {f:pd.to_numeric(CTG_features[f], errors='coerce').fillna(1000) for f in CTG_features if f != extra_feature}
+    c_ctg = {f: [v for v in CTG_features[f] if v != 'NaN'] for f in CTG_features if f != extra_feature}
     # --------------------------------------------------------------------------
     return c_ctg
 
