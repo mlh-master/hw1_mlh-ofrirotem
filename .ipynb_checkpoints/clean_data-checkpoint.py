@@ -11,7 +11,8 @@ import matplotlib.pyplot as plt
 
 def rm_ext_and_nan(CTG_features, extra_feature):
     """
-
+    removes an unnecessary feature and drops the NaN values for the rest of the features
+    
     :param CTG_features: Pandas series of CTG features
     :param extra_feature: A feature to be removed
     :return: A dictionary of clean CTG called c_ctg
@@ -24,7 +25,8 @@ def rm_ext_and_nan(CTG_features, extra_feature):
 
 def nan2num_samp(CTG_features, extra_feature):
     """
-
+    replaces NaN values with a random values from the feature vector
+    
     :param CTG_features: Pandas series of CTG features
     :param extra_feature: A feature to be removed
     :return: A pandas dataframe of the dictionary c_cdf containing the "clean" features
@@ -40,7 +42,8 @@ def nan2num_samp(CTG_features, extra_feature):
 
 def sum_stat(c_feat):
     """
-
+    create a dictionary of statistics summary for the features of the data
+    
     :param c_feat: Output of nan2num_cdf
     :return: Summary statistics as a dicionary of dictionaries (called d_summary) as explained in the notebook
     """
@@ -52,7 +55,8 @@ def sum_stat(c_feat):
 
 def rm_outlier(c_feat, d_summary):
     """
-
+    removes the outliers of the data
+    
     :param c_feat: Output of nan2num_cdf
     :param d_summary: Output of sum_stat
     :return: Dataframe of the dictionary c_no_outlier containing the feature with the outliers removed
@@ -72,6 +76,7 @@ def rm_outlier(c_feat, d_summary):
 
 def phys_prior(c_cdf, feature, thresh):
     """
+    applys a physiological logic rules on a feature
 
     :param c_cdf: Output of nan2num_cdf
     :param feature: A string of your selected feature
@@ -86,6 +91,7 @@ def phys_prior(c_cdf, feature, thresh):
 
 def norm_standard(CTG_features, selected_feat=('LB', 'ASTV'), mode='none', flag=False):
     """
+    normalize or standartize the data
 
     :param CTG_features: Pandas series of CTG features
     :param selected_feat: A two elements tuple of strings of the features for comparison
@@ -95,12 +101,25 @@ def norm_standard(CTG_features, selected_feat=('LB', 'ASTV'), mode='none', flag=
     """
     x, y = selected_feat
     # ------------------ IMPLEMENT YOUR CODE HERE:------------------------------
-    from sklearnearn.preprocessing import StandardScaler, MinMaxScaler
-    modes = {'Standard': StandardScaler(),
-             'MinMax': MinMaxScaler(),
-             'mean': None,
-             'none': None
+    nsd_res = CTG_features.copy()
+    
+    std = lambda feat: pd.DataFrame([i for i in map(lambda v: (v - feat.mean()) / feat.std(), feat)])
+    minmax = lambda feat: pd.DataFrame([i for i in map(lambda v: (v - feat.min()) / (feat.max() - feat.min()), feat)])
+    mean = lambda feat: pd.DataFrame([i for i in map(lambda v: (v - feat.mean()) / (feat.max() - feat.min()), feat)])
+    
+    modes = {'mean': lambda x, y: (mean(CTG_features[x]), mean(CTG_features[y])),
+             'MinMax': lambda x, y: (minmax(CTG_features[x]), minmax(CTG_features[y])),
+             'standard': lambda x, y: (std(CTG_features[x]), std(CTG_features[y])),
+             'none': lambda x, y: (CTG_features[x], CTG_features[y])
     }
     
+    nsd_res[x], nsd_res[y] = modes[mode](x, y)
+    
+    if flag:
+        nsd_res[[x, y]].plot(kind='hist', bins=100)
+        plt.ylabel('Count')
+        plt.xlabel('Value')
+        plt.legend()
+        plt.show()
     # -------------------------------------------------------------------------
     return pd.DataFrame(nsd_res)
