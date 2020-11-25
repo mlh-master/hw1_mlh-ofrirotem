@@ -103,17 +103,20 @@ def norm_standard(CTG_features, selected_feat=('LB', 'ASTV'), mode='none', flag=
     # ------------------ IMPLEMENT YOUR CODE HERE:------------------------------
     nsd_res = CTG_features.copy()
     
-    std = lambda feat: pd.DataFrame([i for i in map(lambda v: (v - feat.mean()) / feat.std(), feat)])
-    minmax = lambda feat: pd.DataFrame([i for i in map(lambda v: (v - feat.min()) / (feat.max() - feat.min()), feat)])
-    mean = lambda feat: pd.DataFrame([i for i in map(lambda v: (v - feat.mean()) / (feat.max() - feat.min()), feat)])
+    std = lambda feat: [i for i in map(lambda v: (v - feat.mean()) / feat.std(), feat)]
     
-    modes = {'mean': lambda x, y: (mean(CTG_features[x]), mean(CTG_features[y])),
-             'MinMax': lambda x, y: (minmax(CTG_features[x]), minmax(CTG_features[y])),
-             'standard': lambda x, y: (std(CTG_features[x]), std(CTG_features[y])),
-             'none': lambda x, y: (CTG_features[x], CTG_features[y])
+    minmax = lambda feat: [i for i in map(lambda v: (v - feat.min()) / (feat.max() - feat.min()), feat)]
+    
+    mean = lambda feat: [i for i in map(lambda v: (v - feat.mean()) / (feat.max() - feat.min()), feat)]
+    
+    modes = {'mean': mean,
+             'MinMax': minmax,
+             'standard': std, 
+             'none': lambda x: x
     }
     
-    nsd_res[x], nsd_res[y] = modes[mode](x, y)
+    for f in nsd_res.columns:
+        nsd_res[f] = modes[mode](CTG_features[f])
     
     if flag:
         nsd_res[[x, y]].plot(kind='hist', bins=100)
