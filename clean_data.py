@@ -35,7 +35,7 @@ def nan2num_samp(CTG_features, extra_feature):
     # ------------------ IMPLEMENT YOUR CODE HERE:------------------------------
     for f in CTG_features:
         if f != extra_feature:
-            c_cdf[f] = pd.to_numeric(CTG_features[f], errors='coerce').fillna(np.random.choice(CTG_features[f].convert_dtypes(convert_integer=True)))
+            c_cdf[f] = pd.to_numeric(CTG_features[f], errors='coerce').fillna(np.random.choice(CTG_features[f].astype(float, errors='ignore')))
     # -------------------------------------------------------------------------
     return pd.DataFrame(c_cdf)
 
