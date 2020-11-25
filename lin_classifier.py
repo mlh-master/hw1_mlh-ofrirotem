@@ -88,7 +88,13 @@ def cv_kfold(X, y, C, penalty, K, mode):
             for train_idx, val_idx in kf.split(X, y):
                 x_train, x_val = X.iloc[train_idx], X.iloc[val_idx]
         # ------------------ IMPLEMENT YOUR CODE HERE:-----------------------------
-
+                y_train, y_val = y[train_idx], y[val_idx]
+                y_pred, w = pred_log(logreg, nsd(x_train, mode=mode), y_train, nsd(x_val, mode=mode), flag=True)
+                loss_val_vec[k] = log_loss(y_val, y_pred)
+                k += 1
+            std = loss_val_vec.std()
+            mean = loss_val_vec.mean()
+            validation_dict.append({'C': c, 'penalty': p, 'mu': mean, 'sigma': std})
         # --------------------------------------------------------------------------
     return validation_dict
 
