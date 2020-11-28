@@ -20,11 +20,11 @@ def pred_log(logreg, X_train, y_train, X_test, flag=False):
     """
     # ------------------ IMPLEMENT YOUR CODE HERE:-----------------------------
     logreg.fit(X_train, y_train)
-    if not flag:
-        y_pred = logreg.pred_log(X_test)
+    if flag:
+        y_pred_log = logreg.predict_proba(X_test)
     else:
-        y_pred = pass
-    w_log = logreg.coef()
+        y_pred_log = logreg.predict(X_test)
+    w_log = logreg.coef_
     # -------------------------------------------------------------------------
     return y_pred_log, w_log
 
@@ -88,7 +88,13 @@ def cv_kfold(X, y, C, penalty, K, mode):
             for train_idx, val_idx in kf.split(X, y):
                 x_train, x_val = X.iloc[train_idx], X.iloc[val_idx]
         # ------------------ IMPLEMENT YOUR CODE HERE:-----------------------------
-
+                y_train, y_val = y[train_idx], y[val_idx]
+                y_pred, w = pred_log(logreg, nsd(x_train, mode=mode), y_train, nsd(x_val, mode=mode), flag=True)
+                loss_val_vec[k] = log_loss(y_val, y_pred)
+                k += 1
+            std = loss_val_vec.std()
+            mean = loss_val_vec.mean()
+            validation_dict.append({'C': c, 'penalty': p, 'mu': mean, 'sigma': std})
         # --------------------------------------------------------------------------
     return validation_dict
 
@@ -103,7 +109,9 @@ def odds_ratio(w, X, selected_feat='LB'):
              odds_ratio: the odds ratio of the selected feature and label
     """
     # ------------------ IMPLEMENT YOUR CODE HERE:-----------------------------
-
+    col_idx = X.columns.get_loc(selected_feat)
+    odds = np.median(np.exp(X @ w[0:1, :].transpose()))
+    odd_ratio = np.exp(w[0, col_idx])
     # --------------------------------------------------------------------------
 
     return odds, odd_ratio
